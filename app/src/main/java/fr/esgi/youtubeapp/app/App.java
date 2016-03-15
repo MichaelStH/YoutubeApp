@@ -29,6 +29,10 @@ public class App extends Application {
         Log.i( TAG, "OnCreate()" );
     }
 
+    /**
+     * Return the RestClient object in order to use Retrofit library
+     * @return youtubeVideoRestClient
+     */
     public static YoutubeVideoRestClient getYoutubeRestClient(){
         return youtubeVideoRestClient;
     }

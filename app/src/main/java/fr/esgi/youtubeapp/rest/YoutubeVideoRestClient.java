@@ -12,6 +12,7 @@ public class YoutubeVideoRestClient {
 
     private static final String TAG = YoutubeVideoRestClient.class.getSimpleName();
 
+    //TODO : Change the base endpoint url or it won't work
     private static final String BASE_ENDPOINT = "link to fetch";
 
     private YoutubeVideoApiService apiService;

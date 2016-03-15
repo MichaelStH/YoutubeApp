@@ -11,7 +11,8 @@ import retrofit.http.GET;
  */
 public interface YoutubeVideoApiService {
 
+    //Method to retrieve the youtube content
     @GET("/")
-    void fetchYoutubeVideos(List<Video> youtubeVideosList, Callback cb);
+    void fetchYoutubeVideos(List<Video> youtubeVideosList, Callback<List<Video>> cb);
 
 }
