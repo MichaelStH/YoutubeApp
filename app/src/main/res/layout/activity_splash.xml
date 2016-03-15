@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/splashBackgroundColor"
+    tools:context=".activities.SplashActivity">
+
+    <ImageView
+        android:id="@+id/splash_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginStart="36dp"
+        android:layout_marginEnd="36dp"
+        android:adjustViewBounds="true"
+        android:src="@drawable/youtube_icon_like"/>
+
+    <ProgressBar
+        android:id="@+id/splash_loader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        style="?android:attr/progressBarStyleLargeInverse"
+        android:layout_gravity="center"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/splash_image"
+        android:visibility="gone"/>
+
+</RelativeLayout>
