@@ -40,16 +40,22 @@ public class YoutubeRecyclerAdapter extends RecyclerView.Adapter<YoutubeRecycler
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
-        public ImageView itemImageThumb;
         public ProgressBar itemLoader;
-        public TextView itemTitle;
+        public ImageView imageThumb;
+        public TextView name, description;
 
         public ViewHolder(View view) {
             super(view);
 
-            //TODO : Add the views in item list row
+            itemLoader = (ProgressBar) view.findViewById(R.id.loader_item);
+
+            imageThumb = (ImageView) view.findViewById(R.id.image_item);
+
+            name = (TextView) view.findViewById(R.id.name_item);
+            description = (TextView) view.findViewById(R.id.description_item);
         }
     }
+
 
     @Override
     public int getItemCount() {
@@ -72,12 +78,10 @@ public class YoutubeRecyclerAdapter extends RecyclerView.Adapter<YoutubeRecycler
             holder.itemLoader.setVisibility(View.VISIBLE);
         }
 
-        holder.itemTitle.setText(itemYoutubeVideo.getTitle());
-
         //Call Picasso to display the correct image in each row view item
         Picasso.with(context)
-                .load(itemYoutubeVideo.getThumbnail())
-                .into(holder.itemImageThumb, new ImageLoadedCallback( holder.itemLoader ) {
+                .load(itemYoutubeVideo.getImageThumb())
+                .into(holder.imageThumb, new ImageLoadedCallback( holder.itemLoader ) {
                     @Override
                     public void onSuccess() {
                         if (holder.itemLoader != null) {
@@ -88,7 +92,7 @@ public class YoutubeRecyclerAdapter extends RecyclerView.Adapter<YoutubeRecycler
                     @Override
                     public void onError() {
 
-                        holder.itemImageThumb.setImageResource(R.mipmap.ic_launcher);
+                        holder.imageThumb.setImageResource(R.mipmap.ic_launcher);
 
                         Log.e(TAG, "bandeau pictures - OOOOOOOHHH CA VA PAAAAAS LAAAAA !!!");
 
@@ -97,6 +101,9 @@ public class YoutubeRecyclerAdapter extends RecyclerView.Adapter<YoutubeRecycler
                         }
                     }
                 });
+
+        holder.name.setText(itemYoutubeVideo.getName());
+        holder.description.setText(itemYoutubeVideo.getDescription());
     }
 
     private class ImageLoadedCallback implements Callback{

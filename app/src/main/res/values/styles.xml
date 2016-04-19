@@ -16,5 +16,14 @@
         <item name="colorPrimaryDark">@color/splashColorPrimaryDark</item>
     </style>
 
+    //Splash Theme
+    <style name="YoutubeStyle" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="windowNoTitle">false</item>
+        <item name="windowActionBar">true</item>
+        <item name="colorPrimary">@color/splashColorPrimary</item>
+        <item name="colorPrimaryDark">@color/splashColorPrimaryDark</item>
+        <item name="colorAccent">@color/splashColorAccent</item>
+    </style>
+
 
 </resources>

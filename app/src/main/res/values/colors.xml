@@ -7,5 +7,8 @@
     <color name="splashBackgroundColor">#770909</color>
     <color name="splashColorPrimary">#E53935</color>
     <color name="splashColorPrimaryDark">#C62828</color>
+    <color name="splashColorAccent">#ef5350</color>
+
+    <color name="white">#ffffff</color>
 
 </resources>

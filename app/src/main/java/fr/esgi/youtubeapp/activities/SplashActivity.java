@@ -30,20 +30,26 @@ public class SplashActivity extends AppCompatActivity {
         //create a new progress bar
         progressBar = null;
         if (rootView != null) {
+
+            //Initialize the progressBar and display it
             progressBar = (ProgressBar) rootView.findViewById(R.id.splash_loader);
             progressBar.setVisibility(View.VISIBLE);
         }
 
+        //create a handler to simulate the initialisation of the application
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
 
+                //Verify if the progressBar is showed
                 if ( progressBar.isInLayout() ){
+                    //Hide the progressBar
                     progressBar.setVisibility( View.GONE );
                 }
 
                 Intent intent = new Intent( mContext, FetchContentActivity.class );
                 startActivity( intent );
+                finish();
             }
         }, TIME_POST_DELAYED );
 

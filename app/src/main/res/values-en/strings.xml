@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">YoutubeApp</string>
+    
+    <string name="hint_content_title">Video\'s title</string>
+    <string name="hint_content_description">Video\'s description link</string>
+
+</resources>
