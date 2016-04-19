@@ -44,9 +44,6 @@ public class FetchContentActivity extends AppCompatActivity {
     private RecyclerView contentRecyclerView;
     private YoutubeRecyclerAdapter contentAdapter;
 
-    //REST features
-    private YoutubeVideoRestClient mRestClient = new YoutubeVideoRestClient();
-
     //Data
     private List<Video> contentList = new ArrayList<>();
 
@@ -93,7 +90,7 @@ public class FetchContentActivity extends AppCompatActivity {
                     contentRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(mContext, new RecyclerItemClickListener.OnItemClickListener() {
                         @Override
                         public void onItemClick(View view, int position) {
-                            Toast.makeText(mContext, position + " is selected", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(mContext, position + " is selected", Toast.LENGTH_SHORT).show();
 
                             //Get the object's position in order to use the object and pass the data through the other activity
                             Video content = contentList.get( position );

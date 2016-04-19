@@ -50,6 +50,7 @@ public class SplashActivity extends AppCompatActivity {
                 Intent intent = new Intent( mContext, FetchContentActivity.class );
                 startActivity( intent );
                 finish();
+
             }
         }, TIME_POST_DELAYED );
 

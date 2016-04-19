@@ -73,8 +73,6 @@ public class ContentActivity extends AppCompatActivity {
             description = extras.getString(DESCRIPTION_ARG);
             thumb = extras.getString(IMAGE_THUMB_URL_ARG);
             video_url = extras.getString(VIDEO_URL_ARG);
-
-
         }
 
         initViews();

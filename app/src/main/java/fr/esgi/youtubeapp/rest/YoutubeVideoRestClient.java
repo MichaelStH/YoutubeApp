@@ -16,6 +16,7 @@ public class YoutubeVideoRestClient {
 
     private static final String TAG = YoutubeVideoRestClient.class.getSimpleName();
 
+    //BASE_ENDPOINT to fetch
     private static final String BASE_ENDPOINT = "https://raw.githubusercontent.com";
 
     private YoutubeVideoApiService apiService;
