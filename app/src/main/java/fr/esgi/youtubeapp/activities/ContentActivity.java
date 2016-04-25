@@ -16,8 +16,11 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import fr.esgi.youtubeapp.R;
+import fr.esgi.youtubeapp.database.DatabaseOpenHelper;
+import fr.esgi.youtubeapp.database.DatabaseRepository;
 import fr.esgi.youtubeapp.model.Video;
 import fr.esgi.youtubeapp.utils.Utils;
 
@@ -40,14 +43,16 @@ public class ContentActivity extends AppCompatActivity {
     public static final String DESCRIPTION_ARG = "content_description";
     public static final String IMAGE_THUMB_URL_ARG = "content_image_thumb_url";
     public static final String VIDEO_URL_ARG = "content_video_url";
+    public static final String IS_FAVORITE_ARG = "is_favorite";
 
     private String id, name, description, thumb, video_url;
+    private boolean is_favorite = false;
 
     private Video item;
 
     //Database
-//    private YoutubeDatabaseRepository mRepo;
-//    private YoutubeDatabaseOpenHelper mDBOpenHelper;
+    private DatabaseRepository mRepo;
+    private DatabaseOpenHelper mDBOpenHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +63,7 @@ public class ContentActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(TAG);
 
         mContext = this;
-//        mDBOpenHelper = new YoutubeDatabaseOpenHelper( mContext );
+        mDBOpenHelper = new DatabaseOpenHelper( mContext );
 
         Bundle extras = getIntent().getExtras();
 
@@ -73,65 +78,30 @@ public class ContentActivity extends AppCompatActivity {
             description = extras.getString(DESCRIPTION_ARG);
             thumb = extras.getString(IMAGE_THUMB_URL_ARG);
             video_url = extras.getString(VIDEO_URL_ARG);
+
+            is_favorite = extras.getBoolean(IS_FAVORITE_ARG);
+
+            item = createYoutubeObject(id, name);
         }
 
         initViews();
-        isFavourite();
+        setListeners();
+        loadContent();
 
-        Picasso.with(mContext)
-                .load(thumb)
-                .into(imageThumb);
-
-        titleTextView.setText( name );
-        descriptionTextView.setText( description );
-
-        addToFavoriteImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Log.i( TAG, "add to favourite" );
-
-//                mRepo = new YoutubeDatabaseRepository(mContext);
-                try{
-
-                    item = createYoutubeObject(id, name);
-                    Log.e("OHOH", item.getFavId() + " --- " + item.getName());
-
-//                    mRepo.Open();
-
-                    if ( !isFavourite() ){
-//                        mRepo.SaveVideo( item );
-                        addToFavoriteImage.setImageResource(R.drawable.ic_star_black_24dp);
-
-                        Utils.showActionInToast(mContext, "Add to favorite");
-                    }
-                    else {
-//                        mRepo.DeleteVideo( item.getFavId() );
-                        addToFavoriteImage.setImageResource(R.drawable.ic_star_border_black_24dp);
-
-                        Utils.showActionInToast( mContext, "Delete from favorite" );
-                    }
-
-//                    mRepo.Close();
-
-                } catch (Exception e){
-                    Log.e( TAG, "Erreur : " + e.getMessage() );
-                }
+    }
 
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.e( "OHOH", "onResume"  );
 
-            }
-        });
-
-        launchVideoImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Log.i( TAG, "launchVideo" );
-                watchYoutubeVideo( mContext, video_url );
-            }
-        });
-
+        if ( !is_favorite ){
+            addToFavoriteImage.setImageResource(R.drawable.ic_star_border_black_24dp);
+        }
+        else {
+            addToFavoriteImage.setImageResource(R.drawable.ic_star_black_24dp);
+        }
     }
 
     private void initViews(){
@@ -146,6 +116,57 @@ public class ContentActivity extends AppCompatActivity {
 
     }
 
+    private void loadContent(){
+
+        Picasso.with(mContext)
+                .load(thumb)
+                .into(imageThumb);
+
+        titleTextView.setText( name );
+        descriptionTextView.setText( description );
+
+        if ( !is_favorite ){
+            addToFavoriteImage.setImageResource(R.drawable.ic_star_border_black_24dp);
+        }
+        else {
+            addToFavoriteImage.setImageResource(R.drawable.ic_star_black_24dp);
+        }
+    }
+
+
+    private void setListeners(){
+
+        this.addToFavoriteImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Log.i( TAG, "add to favourite" );
+
+                if( is_favorite ){
+                    removeFromFavorite( item );
+                    is_favorite = false;
+                    addToFavoriteImage.setImageResource(R.drawable.ic_star_border_black_24dp);
+                }
+                else{
+                    saveInFavorite( item );
+                    is_favorite = true;
+                    addToFavoriteImage.setImageResource(R.drawable.ic_star_black_24dp);
+                }
+
+
+            }
+        });
+
+        this.launchVideoImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Log.i( TAG, "launchVideo" );
+                watchYoutubeVideo( mContext, video_url );
+            }
+        });
+    }
+
 
     private Video createYoutubeObject(String id, String name){
         return new Video(id, name);
@@ -157,9 +178,8 @@ public class ContentActivity extends AppCompatActivity {
         Log.i( TAG, "isFavourite Method" );
 
         boolean check = false;
-        /**
 
-        mRepo = new YoutubeDatabaseRepository(mContext);
+        mRepo = new DatabaseRepository(mContext);
 
         try {
 
@@ -170,21 +190,40 @@ public class ContentActivity extends AppCompatActivity {
             boolean isEmpty = mRepo.IsEmpty();
 
             //If empty
-            if (isEmpty) {
+            if ( isEmpty ) {
 
-                Log.e(TAG, "(YoutubeDatabaseRepository) YoutubeItem empty - No video Records");
+                Log.e(TAG, "(DatabaseRepository) Video empty - No video Records");
+                Utils.showActionInToast( mContext, "No video Recorded in database" );
 
             }
             //Or not
             else {
 
-                Log.e(TAG, "(YoutubeDatabaseRepository) YoutubeItem not empty");
-                //contactTempList = mRepo.GetAll();
+                Log.e(TAG, "(DatabaseRepository) YoutubeItem not empty");
+                List<Video> videoTempList = mRepo.GetAll();
 
-                if (contactTempList != null) {
-                    Log.d(TAG, "(getContactsDatabaseList) contactTempList not null");
-                    if (contactTempList.size() != 0) {
-                        Log.d(TAG, "(getContactsDatabaseList) contactTempList.size != 0");
+
+                Log.e( TAG, "youtubeTempList : " + videoTempList.toString() );
+
+                if (videoTempList != null) {
+                    Log.d(TAG, "(getYoutubeDatabaseList) youtubeTempList not null");
+
+                    if (videoTempList.size() != 0) {
+
+                        Log.d(TAG, "(getYoutubeDatabaseList) youtubeTempList.size != 0");
+                        for ( Video video : videoTempList ){
+                            if ( !video.getName().equals( item.getName() ) ){
+                                Log.i( TAG, "Is not already in" );
+                                //IS_FAVORITE = false;
+                                check = false;
+                            }
+                            else{
+                                Log.i( TAG, "Is already in" );
+                                //IS_FAVORITE = true;
+                                check = true;
+                            }
+                        }
+
                     }
                 }
 
@@ -192,11 +231,56 @@ public class ContentActivity extends AppCompatActivity {
         }
         catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            mRepo.Close();
         }
 
-        mRepo.Close();
-*/
         return check;
+    }
+
+    private boolean saveInFavorite( Video video ){
+
+        boolean saved = false;
+
+        mRepo = new DatabaseRepository(mContext);
+
+        try {
+
+            mRepo.Open();
+            mRepo.SaveVideo( video );
+
+            saved = true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            mRepo.Close();
+        }
+
+        return saved;
+    }
+
+
+    private boolean removeFromFavorite( Video video ){
+
+        boolean removed = false;
+
+        mRepo = new DatabaseRepository(mContext);
+
+        try {
+
+            mRepo.Open();
+            mRepo.DeleteVideo( video.getFavId() );
+
+            removed = true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            mRepo.Close();
+        }
+
+        return removed;
     }
 
     public static void watchYoutubeVideo(Context context, String videoUrl){
@@ -209,4 +293,5 @@ public class ContentActivity extends AppCompatActivity {
             Log.e( TAG, "Erreur : " + e.getMessage());
         }
     }
+
 }

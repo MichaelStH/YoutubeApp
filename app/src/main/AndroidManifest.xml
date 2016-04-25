@@ -29,7 +29,11 @@
 
         <activity android:name=".activities.ContentActivity"
             android:label="@string/app_name"
-            android:theme="@style/YoutubeStyle"/>
+            android:theme="@style/YoutubeStyle">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.FetchContentActivity"/>
+        </activity>
 
     </application>
 

@@ -28,6 +28,14 @@ public class Video {
         this.name = name;
     }
 
+    public Video(Integer db_id, String fav_id, String name){
+
+        this.db_id = db_id;
+
+        this.fav_id = fav_id;
+        this.name = name;
+    }
+
     public Video(String fav_id, String name, String description, String imageThumb, String videoUrl){
 
         this.fav_id = fav_id;
@@ -38,9 +46,21 @@ public class Video {
 
     }
 
-    //////////////////////////////////////////////////////////////////
+    public Video(Integer db_id, String fav_id, String name, String description, String imageThumb, String videoUrl){
+
+        this.db_id = db_id;
+
+        this.fav_id = fav_id;
+        this.name = name;
+        this.description = description;
+        this.imageThumb = imageThumb;
+        this.videoUrl = videoUrl;
+
+    }
+
+    ///////////////////////////////////////////////////////////////////////
     ////////////////////  GETTER & SETTER  ///////////////////////////
-    //////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
 
     public Integer getId() {
         return db_id;

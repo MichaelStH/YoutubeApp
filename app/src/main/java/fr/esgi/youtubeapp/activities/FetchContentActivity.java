@@ -12,12 +12,14 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import fr.esgi.youtubeapp.R;
 import fr.esgi.youtubeapp.adapter.YoutubeRecyclerAdapter;
 import fr.esgi.youtubeapp.app.App;
+import fr.esgi.youtubeapp.database.DatabaseRepository;
 import fr.esgi.youtubeapp.model.Video;
 import fr.esgi.youtubeapp.rest.YoutubeVideoRestClient;
 import fr.esgi.youtubeapp.rest.service.YoutubeVideoApiService;
@@ -103,6 +105,8 @@ public class FetchContentActivity extends AppCompatActivity {
                             intent.putExtra(ContentActivity.IMAGE_THUMB_URL_ARG, content.getImageThumb());
                             intent.putExtra(ContentActivity.VIDEO_URL_ARG, content.getVideoUrl());
 
+                            intent.putExtra(ContentActivity.IS_FAVORITE_ARG, isFavorite( content ) );
+
                             startActivity(intent);
                         }
                     }));
@@ -140,5 +144,70 @@ public class FetchContentActivity extends AppCompatActivity {
 
         mLoader = (ProgressBar) findViewById(R.id.youtube_content_loader);
         contentRecyclerView = (RecyclerView) findViewById(R.id.youtube_content_recyclerView);
+    }
+
+    private boolean isFavorite( Video contentVideo ){
+
+        Log.i( TAG, "isFavourite Method" );
+
+        boolean check = false;
+
+        DatabaseRepository mRepo = new DatabaseRepository(mContext);
+
+        try {
+
+            //Open database
+            mRepo.Open();
+
+            //Check if the database is empty
+            boolean isEmpty = mRepo.IsEmpty();
+
+            //If empty
+            if ( isEmpty ) {
+
+                Log.e(TAG, "(DatabaseRepository) Video empty - No video Records");
+                Utils.showActionInToast( mContext, "No video Recorded in database" );
+
+            }
+            //Or not
+            else {
+
+                Log.e(TAG, "(DatabaseRepository) YoutubeItem not empty");
+                List<Video> videoTempList = mRepo.GetAll();
+
+
+                Log.e( TAG, "youtubeTempList : " + videoTempList.toString() );
+
+                if (videoTempList != null) {
+                    Log.d(TAG, "(getYoutubeDatabaseList) youtubeTempList not null");
+
+                    if (videoTempList.size() != 0) {
+
+                        Log.d(TAG, "(getYoutubeDatabaseList) youtubeTempList.size != 0");
+                        for ( Video video : videoTempList ){
+                            if ( !video.getName().equals( contentVideo.getName() ) ){
+                                Log.i( TAG, "Is not already in" );
+                                //IS_FAVORITE = false;
+                                check = false;
+                            }
+                            else{
+                                Log.i( TAG, "Is already in" );
+                                //IS_FAVORITE = true;
+                                check = true;
+                            }
+                        }
+
+                    }
+                }
+
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            mRepo.Close();
+        }
+
+        return check;
     }
 }
