@@ -3,16 +3,22 @@ package fr.esgi.youtubeapp.activities;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.sql.SQLException;
@@ -22,6 +28,7 @@ import fr.esgi.youtubeapp.R;
 import fr.esgi.youtubeapp.database.DatabaseOpenHelper;
 import fr.esgi.youtubeapp.database.DatabaseRepository;
 import fr.esgi.youtubeapp.model.Video;
+import fr.esgi.youtubeapp.utils.ImageManagerUtils;
 import fr.esgi.youtubeapp.utils.Utils;
 
 /**
@@ -34,7 +41,8 @@ public class ContentActivity extends AppCompatActivity {
     private Context mContext;
 
     //Views
-    private ImageView imageThumb, addToFavoriteImage, launchVideoImage;
+    private View rootView;
+    private ImageView imageThumb, imageThumbBlurred, addToFavoriteImage, launchVideoImage;
     private TextView titleTextView, descriptionTextView;
 
     //Bundle Arguments
@@ -54,9 +62,19 @@ public class ContentActivity extends AppCompatActivity {
     private DatabaseRepository mRepo;
     private DatabaseOpenHelper mDBOpenHelper;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        /*
+        Where myBitmap is the Image from which you want to extract the color.
+        Also for API 21 and above, you'll need to add the following flags if you're planning to color the status bar and navigation bar:
+         */
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        }
+
         setContentView(R.layout.activity_content);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -85,8 +103,8 @@ public class ContentActivity extends AppCompatActivity {
         }
 
         initViews();
-        setListeners();
         loadContent();
+        setListeners();
 
     }
 
@@ -106,7 +124,10 @@ public class ContentActivity extends AppCompatActivity {
 
     private void initViews(){
 
+        rootView = getWindow().getDecorView();
+
         imageThumb = (ImageView) findViewById(R.id.content_image_thumb);
+        imageThumbBlurred = (ImageView) findViewById(R.id.content_image_thumb_blurred);
         addToFavoriteImage = (ImageView) findViewById(R.id.content_image_add_to_favourite);
         launchVideoImage = (ImageView) findViewById(R.id.content_image_launch_video);
 
@@ -118,9 +139,42 @@ public class ContentActivity extends AppCompatActivity {
 
     private void loadContent(){
 
+        //Load the background  thumb image
         Picasso.with(mContext)
                 .load(thumb)
-                .into(imageThumb);
+                .into(imageThumbBlurred);
+
+        ImageManagerUtils.setBlurredImage( mContext, imageThumbBlurred, 5 );
+
+
+        //Load the thumb image clicked before
+        Picasso.with(mContext)
+                .load(thumb)
+                .into(imageThumb, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.i(TAG, "Image is correctly downloaded");
+
+                        //retrouver le bitmap téléchargé par Picasso
+                        Bitmap bitmap = ((BitmapDrawable) imageThumb.getDrawable()).getBitmap();
+
+                        //demande à la palette de générer ses coleurs, de façon asynchrone
+                        //afin de ne pas bloquer l'interface graphique
+                        new Palette.Builder(bitmap).generate(new Palette.PaletteAsyncListener() {
+                            @Override
+                            public void onGenerated(Palette palette) {
+
+                                //lorsque la palette est générée, je l'utilise sur mes textViews
+                                generatePalette(palette);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
 
         titleTextView.setText( name );
         descriptionTextView.setText( description );
@@ -135,6 +189,13 @@ public class ContentActivity extends AppCompatActivity {
 
 
     private void setListeners(){
+
+        this.rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                rootView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+            }
+        });
 
         this.addToFavoriteImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -283,15 +344,45 @@ public class ContentActivity extends AppCompatActivity {
         return removed;
     }
 
+    /**
+     * This function launch the Youtube App if it is installed , if it's not launch the broswer instead
+     * @param context
+     * @param videoUrl
+     */
     public static void watchYoutubeVideo(Context context, String videoUrl){
         try {
+
+            Log.i( TAG, "Launch video in Youtube App" );
 
             Intent intent = new Intent( Intent.ACTION_VIEW, Uri.parse(videoUrl) );
             context.startActivity( intent );
 
         } catch (ActivityNotFoundException e) {
-            Log.e( TAG, "Erreur : " + e.getMessage());
+            Log.e( TAG, "Error : " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
+    /**
+     * Generate palette in order to change toolbar's color
+     * @param palette
+     */
+    public void generatePalette(Palette palette) {
+        {
+            Palette.Swatch muted = palette.getMutedSwatch();
+
+            //il se peut que la palette ne génère pas tous les swatch
+            if (muted != null) {
+                //j'utilise getRgb() en tant que couleur de fond de ma toolbar
+                getSupportActionBar().setBackgroundDrawable(new ColorDrawable(muted.getRgb()));
+            }
+        }
+        {
+            Palette.Swatch mutedDark = palette.getDarkMutedSwatch();
+            if (mutedDark != null) {
+                getWindow().setStatusBarColor(mutedDark.getRgb());
+            }
+
+        }
+    }
 }

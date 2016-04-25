@@ -63,6 +63,11 @@ public class YoutubeRecyclerAdapter extends RecyclerView.Adapter<YoutubeRecycler
     }
 
     @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemYoutubeRow = inflater.inflate(R.layout.content_list_item_row, parent, false );
 

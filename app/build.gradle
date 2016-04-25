@@ -22,6 +22,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
+
     compile 'com.android.support:appcompat-v7:23.2.1'
     compile 'com.android.support:design:23.1.1'
     compile 'com.android.support:palette-v7:23.1.1'
@@ -36,4 +37,12 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.6.0'
 
     compile 'org.parceler:parceler-api:1.0.4'
+
+    //ButterKnife
+    compile 'com.jakewharton:butterknife:7.0.1'
+
+    //RobotoTextView
+    compile 'com.github.johnkil.android-robototextview:robototextview:2.5.0'
+
+    compile 'com.github.bumptech.glide:glide:3.7.0'
 }

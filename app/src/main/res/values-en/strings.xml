@@ -2,8 +2,12 @@
 <resources>
 
     <string name="app_name">YoutubeApp</string>
+    <string name="action_afficher_favoris">Show favorite</string>
     
     <string name="hint_content_title">Video\'s title</string>
     <string name="hint_content_description">Video\'s description link</string>
+
+    <string name="lire">Play</string>
+    <string name="ajouter_aux_favoris">Add to favorite</string>
 
 </resources>

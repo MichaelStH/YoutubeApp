@@ -3,11 +3,15 @@ package fr.esgi.youtubeapp.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -38,6 +42,7 @@ public class FetchContentActivity extends AppCompatActivity {
 
     //TAG and context
     private static final String TAG = FetchContentActivity.class.getSimpleName();
+    private AppCompatActivity mActivity = null;
     private Context mContext = null;
 
     //Views and adapter
@@ -54,6 +59,7 @@ public class FetchContentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fetch_content);
 
+        mActivity = FetchContentActivity.this;
         mContext = this;
 
         //Initialize  the view
@@ -70,6 +76,12 @@ public class FetchContentActivity extends AppCompatActivity {
         if( !DeviceManagerUtils.isConnected(mContext) ) {
 
             Utils.showActionInToast(mContext, "You are not connected to the internet");
+
+            if (mLoader != null) {
+                mLoader.setVisibility(View.GONE);
+                mLoader = null;
+            }
+
         }
         else {
 
@@ -107,7 +119,13 @@ public class FetchContentActivity extends AppCompatActivity {
 
                             intent.putExtra(ContentActivity.IS_FAVORITE_ARG, isFavorite( content ) );
 
-                            startActivity(intent);
+
+                            View source_icon = view.findViewById(R.id.image_item);
+
+                            //Create animation and start activity
+                            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation( FetchContentActivity.this, source_icon, "thumb" );
+
+                            ActivityCompat.startActivity( mActivity, intent, options.toBundle() );
                         }
                     }));
 
@@ -209,5 +227,30 @@ public class FetchContentActivity extends AppCompatActivity {
         }
 
         return check;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_fav, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_show_favorites) {
+
+            startActivity(new Intent( mContext, ShowFavActivity.class ));
+
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

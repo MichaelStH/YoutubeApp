@@ -10,14 +10,16 @@
 
     //Splash Theme
     <style name="SplashStyle" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:windowContentTransitions">true</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
         <item name="colorPrimary">@color/splashColorPrimary</item>
         <item name="colorPrimaryDark">@color/splashColorPrimaryDark</item>
     </style>
 
-    //Splash Theme
+    //Fetch Content Theme
     <style name="YoutubeStyle" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:windowContentTransitions">true</item>
         <item name="windowNoTitle">false</item>
         <item name="windowActionBar">true</item>
         <item name="colorPrimary">@color/splashColorPrimary</item>
