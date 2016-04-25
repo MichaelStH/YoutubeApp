@@ -7,4 +7,8 @@
     <dimen name="thumb_width">147sp</dimen>
     <dimen name="thumb_height">82sp</dimen>
 
+
+    <dimen name="thumb_width_content">197sp</dimen>
+    <dimen name="thumb_height_content">132sp</dimen>
+
 </resources>

@@ -4,6 +4,9 @@
     <string name="app_name">YoutubeApp</string>
     <string name="action_afficher_favoris">Afficher les favoris</string>
 
+    <string name="pas_de_connexion">Vous n\'êtes pas connecté a Internet  :(</string>
+    <string name="verifiez_votre_connexion">Veuillez verifier connexion cellulaire ou Wi-Fi</string>
+
     <string name="hint_content_title">Titre de la vidéo</string>
     <string name="hint_content_description">Lien de description de la vidéo</string>
 

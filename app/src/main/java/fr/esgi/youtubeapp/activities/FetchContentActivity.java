@@ -13,8 +13,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -25,8 +25,6 @@ import fr.esgi.youtubeapp.adapter.YoutubeRecyclerAdapter;
 import fr.esgi.youtubeapp.app.App;
 import fr.esgi.youtubeapp.database.DatabaseRepository;
 import fr.esgi.youtubeapp.model.Video;
-import fr.esgi.youtubeapp.rest.YoutubeVideoRestClient;
-import fr.esgi.youtubeapp.rest.service.YoutubeVideoApiService;
 import fr.esgi.youtubeapp.utils.DeviceManagerUtils;
 import fr.esgi.youtubeapp.utils.DividerItemDecoration;
 import fr.esgi.youtubeapp.utils.RecyclerItemClickListener;
@@ -47,6 +45,7 @@ public class FetchContentActivity extends AppCompatActivity {
 
     //Views and adapter
     private View rootView;
+    private LinearLayout mLinearNoConnectionContainer;
     private ProgressBar mLoader;
     private RecyclerView contentRecyclerView;
     private YoutubeRecyclerAdapter contentAdapter;
@@ -75,12 +74,14 @@ public class FetchContentActivity extends AppCompatActivity {
         //Test the internet's connection
         if( !DeviceManagerUtils.isConnected(mContext) ) {
 
-            Utils.showActionInToast(mContext, "You are not connected to the internet");
-
             if (mLoader != null) {
                 mLoader.setVisibility(View.GONE);
                 mLoader = null;
+
+                mLinearNoConnectionContainer.setVisibility(View.VISIBLE);
             }
+
+            Utils.showActionInToast(mContext, mContext.getResources().getString( R.string.pas_de_connexion ) );
 
         }
         else {
@@ -159,6 +160,8 @@ public class FetchContentActivity extends AppCompatActivity {
     private void initViews(){
 
         rootView = getWindow().getDecorView();
+
+        mLinearNoConnectionContainer = (LinearLayout) findViewById(R.id.no_connection_linear_container);
 
         mLoader = (ProgressBar) findViewById(R.id.youtube_content_loader);
         contentRecyclerView = (RecyclerView) findViewById(R.id.youtube_content_recyclerView);

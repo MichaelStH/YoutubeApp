@@ -3,6 +3,9 @@
 
     <string name="app_name">YoutubeApp</string>
     <string name="action_afficher_favoris">Show favorite</string>
+
+    <string name="pas_de_connexion">Not connected to the Internet :(</string>
+    <string name="verifiez_votre_connexion">Please check your cellular network or Wi-Fi network</string>
     
     <string name="hint_content_title">Video\'s title</string>
     <string name="hint_content_description">Video\'s description link</string>
