@@ -13,21 +13,17 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import fr.esgi.youtubeapp.R;
 import fr.esgi.youtubeapp.adapter.YoutubeRecyclerAdapter;
 import fr.esgi.youtubeapp.app.App;
-import fr.esgi.youtubeapp.database.DatabaseRepository;
 import fr.esgi.youtubeapp.model.Video;
 import fr.esgi.youtubeapp.utils.DeviceManagerUtils;
-import fr.esgi.youtubeapp.utils.DividerItemDecoration;
 import fr.esgi.youtubeapp.utils.RecyclerItemClickListener;
 import fr.esgi.youtubeapp.utils.SharedHelperFavorites;
 import fr.esgi.youtubeapp.utils.Utils;

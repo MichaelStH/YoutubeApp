@@ -3,14 +3,12 @@ package fr.esgi.youtubeapp.activities;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -25,11 +23,8 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 import fr.esgi.youtubeapp.R;
-import fr.esgi.youtubeapp.app.App;
 import fr.esgi.youtubeapp.model.Video;
 import fr.esgi.youtubeapp.utils.ImageManagerUtils;
 import fr.esgi.youtubeapp.utils.SharedHelperFavorites;
@@ -249,50 +244,12 @@ public class ContentActivity extends AppCompatActivity {
             }
         }
 
-
-        /*
-        SharedPreferences preferences = getSharedPreferences(App.SHARED_PREF_TAG, Context.MODE_PRIVATE);
-        is_favorite = preferences.getBoolean( video_url, false );
-
-        Log.i(TAG, String.valueOf( is_favorite ));
-
-        if ( !is_favorite ){
-            check = false;
-        }
-        else{
-            check = true;
-        }
-        */
-
         return check;
     }
 
     private boolean saveInFavorite( String videoURL ){
 
         boolean saved = false;
-
-        /*
-        //Retrieve the values
-        Set<String> set = myScores.getStringSet("key", null);
-
-        //Set the values
-        Set<String> set = new HashSet<String>();
-        set.addAll(listOfExistingScores);
-        scoreEditor.putStringSet("key", set);
-        scoreEditor.commit();
-        */
-
-        /*
-        SharedPreferences preferences = getSharedPreferences(App.SHARED_PREF_TAG, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-
-        editor.putBoolean(videoURL, true);
-
-        editor.commit();
-
-        is_favorite = true;
-        saved = true;*/
-
         Log.d( TAG, "add in shared preferences" );
 
         SharedHelperFavorites.addVideoInFavorites( videoURL );
@@ -305,19 +262,6 @@ public class ContentActivity extends AppCompatActivity {
     private boolean removeFromFavorite( String videoURL ){
 
         boolean removed = false;
-
-        /*
-        SharedPreferences preferences = getSharedPreferences(App.SHARED_PREF_TAG, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-
-        editor.putBoolean(videoURL, true);
-
-        editor.commit();
-
-        is_favorite = false;
-        removed = true;
-        */
-
         Log.d( TAG, "remove from shared preferences" );
 
         SharedHelperFavorites.deleteVideoFromFavorites(videoURL);
