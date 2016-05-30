@@ -3,12 +3,15 @@ package fr.esgi.youtubeapp.activities;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.util.Log;
@@ -21,15 +24,15 @@ import android.widget.TextView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
-import java.sql.SQLException;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import fr.esgi.youtubeapp.R;
-import fr.esgi.youtubeapp.database.DatabaseOpenHelper;
-import fr.esgi.youtubeapp.database.DatabaseRepository;
+import fr.esgi.youtubeapp.app.App;
 import fr.esgi.youtubeapp.model.Video;
 import fr.esgi.youtubeapp.utils.ImageManagerUtils;
-import fr.esgi.youtubeapp.utils.Utils;
+import fr.esgi.youtubeapp.utils.SharedHelperFavorites;
 
 /**
  * Created by MichaelWayne on 15/03/2016.
@@ -54,13 +57,9 @@ public class ContentActivity extends AppCompatActivity {
     public static final String IS_FAVORITE_ARG = "is_favorite";
 
     private String id, name, description, thumb, video_url;
-    private boolean is_favorite = false;
+    private boolean is_favorite;
 
     private Video item;
-
-    //Database
-    private DatabaseRepository mRepo;
-    private DatabaseOpenHelper mDBOpenHelper;
 
 
     @Override
@@ -81,7 +80,7 @@ public class ContentActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(TAG);
 
         mContext = this;
-        mDBOpenHelper = new DatabaseOpenHelper( mContext );
+        SharedHelperFavorites.init(this);
 
         Bundle extras = getIntent().getExtras();
 
@@ -114,7 +113,7 @@ public class ContentActivity extends AppCompatActivity {
         super.onResume();
         Log.e( "OHOH", "onResume"  );
 
-        if ( !is_favorite ){
+        if ( !isFavourite() ){
             addToFavoriteImage.setImageResource(R.drawable.ic_star_border_black_24dp);
         }
         else {
@@ -146,6 +145,8 @@ public class ContentActivity extends AppCompatActivity {
 
         ImageManagerUtils.setBlurredImage( mContext, imageThumbBlurred, 5 );
 
+
+        ViewCompat.setTransitionName(imageThumb, "thumb");
 
         //Load the thumb image clicked before
         Picasso.with(mContext)
@@ -179,7 +180,7 @@ public class ContentActivity extends AppCompatActivity {
         titleTextView.setText( name );
         descriptionTextView.setText( description );
 
-        if ( !is_favorite ){
+        if ( !isFavourite() ){
             addToFavoriteImage.setImageResource(R.drawable.ic_star_border_black_24dp);
         }
         else {
@@ -203,14 +204,12 @@ public class ContentActivity extends AppCompatActivity {
 
                 Log.i( TAG, "add to favourite" );
 
-                if( is_favorite ){
-                    removeFromFavorite( item );
-                    is_favorite = false;
+                if( isFavourite() ){
+                    removeFromFavorite( video_url );
                     addToFavoriteImage.setImageResource(R.drawable.ic_star_border_black_24dp);
                 }
                 else{
-                    saveInFavorite( item );
-                    is_favorite = true;
+                    saveInFavorite( video_url );
                     addToFavoriteImage.setImageResource(R.drawable.ic_star_black_24dp);
                 }
 
@@ -237,109 +236,92 @@ public class ContentActivity extends AppCompatActivity {
     private boolean isFavourite(){
 
         Log.i( TAG, "isFavourite Method" );
-
         boolean check = false;
 
-        mRepo = new DatabaseRepository(mContext);
+        ArrayList array = SharedHelperFavorites.getVideosList();
 
-        try {
-
-            //Open database
-            mRepo.Open();
-
-            //Check if the database is empty
-            boolean isEmpty = mRepo.IsEmpty();
-
-            //If empty
-            if ( isEmpty ) {
-
-                Log.e(TAG, "(DatabaseRepository) Video empty - No video Records");
-                Utils.showActionInToast( mContext, "No video Recorded in database" );
-
+        if (array != null){
+            if (array.contains(video_url)){
+                check = true;
             }
-            //Or not
-            else {
-
-                Log.e(TAG, "(DatabaseRepository) YoutubeItem not empty");
-                List<Video> videoTempList = mRepo.GetAll();
-
-
-                Log.e( TAG, "youtubeTempList : " + videoTempList.toString() );
-
-                if (videoTempList != null) {
-                    Log.d(TAG, "(getYoutubeDatabaseList) youtubeTempList not null");
-
-                    if (videoTempList.size() != 0) {
-
-                        Log.d(TAG, "(getYoutubeDatabaseList) youtubeTempList.size != 0");
-                        for ( Video video : videoTempList ){
-                            if ( !video.getName().equals( item.getName() ) ){
-                                Log.i( TAG, "Is not already in" );
-                                //IS_FAVORITE = false;
-                                check = false;
-                            }
-                            else{
-                                Log.i( TAG, "Is already in" );
-                                //IS_FAVORITE = true;
-                                check = true;
-                            }
-                        }
-
-                    }
-                }
-
+            else{
+                check = false;
             }
         }
-        catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            mRepo.Close();
+
+
+        /*
+        SharedPreferences preferences = getSharedPreferences(App.SHARED_PREF_TAG, Context.MODE_PRIVATE);
+        is_favorite = preferences.getBoolean( video_url, false );
+
+        Log.i(TAG, String.valueOf( is_favorite ));
+
+        if ( !is_favorite ){
+            check = false;
         }
+        else{
+            check = true;
+        }
+        */
 
         return check;
     }
 
-    private boolean saveInFavorite( Video video ){
+    private boolean saveInFavorite( String videoURL ){
 
         boolean saved = false;
 
-        mRepo = new DatabaseRepository(mContext);
+        /*
+        //Retrieve the values
+        Set<String> set = myScores.getStringSet("key", null);
 
-        try {
+        //Set the values
+        Set<String> set = new HashSet<String>();
+        set.addAll(listOfExistingScores);
+        scoreEditor.putStringSet("key", set);
+        scoreEditor.commit();
+        */
 
-            mRepo.Open();
-            mRepo.SaveVideo( video );
+        /*
+        SharedPreferences preferences = getSharedPreferences(App.SHARED_PREF_TAG, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
 
-            saved = true;
+        editor.putBoolean(videoURL, true);
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            mRepo.Close();
-        }
+        editor.commit();
+
+        is_favorite = true;
+        saved = true;*/
+
+        Log.d( TAG, "add in shared preferences" );
+
+        SharedHelperFavorites.addVideoInFavorites( videoURL );
+        saved = true;
 
         return saved;
     }
 
 
-    private boolean removeFromFavorite( Video video ){
+    private boolean removeFromFavorite( String videoURL ){
 
         boolean removed = false;
 
-        mRepo = new DatabaseRepository(mContext);
+        /*
+        SharedPreferences preferences = getSharedPreferences(App.SHARED_PREF_TAG, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
 
-        try {
+        editor.putBoolean(videoURL, true);
 
-            mRepo.Open();
-            mRepo.DeleteVideo( video.getFavId() );
+        editor.commit();
 
-            removed = true;
+        is_favorite = false;
+        removed = true;
+        */
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            mRepo.Close();
-        }
+        Log.d( TAG, "remove from shared preferences" );
+
+        SharedHelperFavorites.deleteVideoFromFavorites(videoURL);
+        removed = true;
 
         return removed;
     }

@@ -19,12 +19,20 @@
 
     //Fetch Content Theme
     <style name="YoutubeStyle" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="android:windowContentTransitions">true</item>
         <item name="windowNoTitle">false</item>
         <item name="windowActionBar">true</item>
         <item name="colorPrimary">@color/splashColorPrimary</item>
         <item name="colorPrimaryDark">@color/splashColorPrimaryDark</item>
         <item name="colorAccent">@color/splashColorAccent</item>
+
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowAllowEnterTransitionOverlap">true</item>
+        <item name="android:windowAllowReturnTransitionOverlap">true</item>
+
+        <!-- specify shared element transitions -->
+        <item name="android:windowSharedElementEnterTransition">@transition/change_image_transform</item>
+        <item name="android:windowSharedElementExitTransition">@transition/change_image_transform</item>
+
     </style>
 
 

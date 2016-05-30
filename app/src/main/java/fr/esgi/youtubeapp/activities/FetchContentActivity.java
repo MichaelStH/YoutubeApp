@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
@@ -28,6 +29,7 @@ import fr.esgi.youtubeapp.model.Video;
 import fr.esgi.youtubeapp.utils.DeviceManagerUtils;
 import fr.esgi.youtubeapp.utils.DividerItemDecoration;
 import fr.esgi.youtubeapp.utils.RecyclerItemClickListener;
+import fr.esgi.youtubeapp.utils.SharedHelperFavorites;
 import fr.esgi.youtubeapp.utils.Utils;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -99,9 +101,10 @@ public class FetchContentActivity extends AppCompatActivity {
 
                     //Set properties for the RecyclerView
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(mContext);
+                    contentRecyclerView.setHasFixedSize(true);
                     contentRecyclerView.setLayoutManager(mLayoutManager);
                     contentRecyclerView.setItemAnimator(new DefaultItemAnimator());
-                    contentRecyclerView.addItemDecoration(new DividerItemDecoration(mContext, LinearLayoutManager.VERTICAL));
+                    //contentRecyclerView.addItemDecoration(new DividerItemDecoration(mContext, LinearLayoutManager.VERTICAL));
                     contentRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(mContext, new RecyclerItemClickListener.OnItemClickListener() {
                         @Override
                         public void onItemClick(View view, int position) {
@@ -173,60 +176,21 @@ public class FetchContentActivity extends AppCompatActivity {
 
         boolean check = false;
 
-        DatabaseRepository mRepo = new DatabaseRepository(mContext);
+        SharedHelperFavorites.init(this);
 
-        try {
+        ArrayList<String> array = SharedHelperFavorites.getVideosList();
 
-            //Open database
-            mRepo.Open();
-
-            //Check if the database is empty
-            boolean isEmpty = mRepo.IsEmpty();
-
-            //If empty
-            if ( isEmpty ) {
-
-                Log.e(TAG, "(DatabaseRepository) Video empty - No video Records");
-                Utils.showActionInToast( mContext, "No video Recorded in database" );
-
-            }
-            //Or not
-            else {
-
-                Log.e(TAG, "(DatabaseRepository) YoutubeItem not empty");
-                List<Video> videoTempList = mRepo.GetAll();
-
-
-                Log.e( TAG, "youtubeTempList : " + videoTempList.toString() );
-
-                if (videoTempList != null) {
-                    Log.d(TAG, "(getYoutubeDatabaseList) youtubeTempList not null");
-
-                    if (videoTempList.size() != 0) {
-
-                        Log.d(TAG, "(getYoutubeDatabaseList) youtubeTempList.size != 0");
-                        for ( Video video : videoTempList ){
-                            if ( !video.getName().equals( contentVideo.getName() ) ){
-                                Log.i( TAG, "Is not already in" );
-                                //IS_FAVORITE = false;
-                                check = false;
-                            }
-                            else{
-                                Log.i( TAG, "Is already in" );
-                                //IS_FAVORITE = true;
-                                check = true;
-                            }
-                        }
-
-                    }
-                }
-
-            }
+        for(String items : array){
+            Log.i( TAG, "item in list favorites : " + items );
         }
-        catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            mRepo.Close();
+
+        if (array != null){
+            if (array.contains(contentVideo.getVideoUrl())){
+                check = true;
+            }
+            else{
+                check = false;
+            }
         }
 
         return check;

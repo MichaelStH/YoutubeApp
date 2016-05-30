@@ -12,6 +12,8 @@ public class App extends Application {
 
     private static final String TAG = App.class.getSimpleName();
 
+    public static final String SHARED_PREF_TAG = "FAVORITE_VIDEO_";
+
     private static App instance;
 
     private static YoutubeVideoRestClient youtubeVideoRestClient;

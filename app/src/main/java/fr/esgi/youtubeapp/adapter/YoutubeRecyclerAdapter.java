@@ -1,6 +1,7 @@
 package fr.esgi.youtubeapp.adapter;
 
 import android.content.Context;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -40,12 +41,16 @@ public class YoutubeRecyclerAdapter extends RecyclerView.Adapter<YoutubeRecycler
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
+        public CardView itemCardView;
+
         public ProgressBar itemLoader;
         public ImageView imageThumb;
         public TextView name, description;
 
         public ViewHolder(View view) {
             super(view);
+
+            itemCardView = (CardView) view.findViewById(R.id.card_view_item);
 
             itemLoader = (ProgressBar) view.findViewById(R.id.loader_item);
 
