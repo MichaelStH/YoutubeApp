@@ -23,13 +23,15 @@ public class ImageManagerUtils {
     private ImageManagerUtils(){ }
 
 
-    public static void setBlurredImage( Context context, ImageView imageView, int radius ){
+    public static void setBlurredImage( Context context, ImageView imageView, int radius ) {
 
         BitmapDrawable drawableFromImageView = (BitmapDrawable) imageView.getDrawable();
-        Bitmap bitmapFromImageView = drawableFromImageView.getBitmap();
-        Bitmap blurred = blurRenderScript(context, bitmapFromImageView, radius);
-        //second parameter is radius
-        imageView.setImageBitmap(blurred);
+        if (drawableFromImageView != null) {
+            Bitmap bitmapFromImageView = drawableFromImageView.getBitmap();
+            Bitmap blurred = blurRenderScript(context, bitmapFromImageView, radius);
+            //second parameter is radius
+            imageView.setImageBitmap(blurred);
+        }
 
     }
 

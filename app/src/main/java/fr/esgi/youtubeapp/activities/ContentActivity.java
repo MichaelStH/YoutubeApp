@@ -140,7 +140,6 @@ public class ContentActivity extends AppCompatActivity {
 
         ImageManagerUtils.setBlurredImage( mContext, imageThumbBlurred, 5 );
 
-
         ViewCompat.setTransitionName(imageThumb, "thumb");
 
         //Load the thumb image clicked before
