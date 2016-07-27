@@ -44,16 +44,15 @@ public class ContentActivity extends AppCompatActivity {
     private TextView titleTextView, descriptionTextView;
 
     //Bundle Arguments
+    public static final String VIDEO_OBJECT_ARG = "content_video";
+
+    /*
     public static final String ID_ARG = "content_id";
     public static final String NAME_ARG = "content_name";
     public static final String DESCRIPTION_ARG = "content_description";
     public static final String IMAGE_THUMB_URL_ARG = "content_image_thumb_url";
     public static final String VIDEO_URL_ARG = "content_video_url";
-    public static final String IS_FAVORITE_ARG = "is_favorite";
-
-    private String id, name, description, thumb, video_url;
-    private boolean is_favorite;
-
+*/
     private Video item;
 
 
@@ -85,6 +84,7 @@ public class ContentActivity extends AppCompatActivity {
         else {
             Log.e(TAG, "get the data one by one");
 
+            /*
             id = extras.getString(ID_ARG);
             name = extras.getString(NAME_ARG);
             description = extras.getString(DESCRIPTION_ARG);
@@ -92,8 +92,8 @@ public class ContentActivity extends AppCompatActivity {
             video_url = extras.getString(VIDEO_URL_ARG);
 
             is_favorite = extras.getBoolean(IS_FAVORITE_ARG);
-
-            item = createYoutubeObject(id, name);
+            */
+            item = extras.getParcelable( VIDEO_OBJECT_ARG );
         }
 
         initViews();
@@ -135,7 +135,7 @@ public class ContentActivity extends AppCompatActivity {
 
         //Load the background  thumb image
         Picasso.with(mContext)
-                .load(thumb)
+                .load(item.getImageThumb())
                 .into(imageThumbBlurred);
 
         ImageManagerUtils.setBlurredImage( mContext, imageThumbBlurred, 5 );
@@ -144,7 +144,7 @@ public class ContentActivity extends AppCompatActivity {
 
         //Load the thumb image clicked before
         Picasso.with(mContext)
-                .load(thumb)
+                .load(item.getImageThumb())
                 .into(imageThumb, new Callback() {
                     @Override
                     public void onSuccess() {
@@ -171,8 +171,8 @@ public class ContentActivity extends AppCompatActivity {
                     }
                 });
 
-        titleTextView.setText( name );
-        descriptionTextView.setText( description );
+        titleTextView.setText( item.getName() );
+        descriptionTextView.setText( item.getDescription() );
 
         if ( !isFavourite() ){
             addToFavoriteImage.setImageResource(R.drawable.ic_star_border_black_24dp);
@@ -199,11 +199,11 @@ public class ContentActivity extends AppCompatActivity {
                 Log.i( TAG, "add to favourite" );
 
                 if( isFavourite() ){
-                    removeFromFavorite( video_url );
+                    removeFromFavorite( item.getVideoUrl() );
                     addToFavoriteImage.setImageResource(R.drawable.ic_star_border_black_24dp);
                 }
                 else{
-                    saveInFavorite( video_url );
+                    saveInFavorite( item.getVideoUrl() );
                     addToFavoriteImage.setImageResource(R.drawable.ic_star_black_24dp);
                 }
 
@@ -216,14 +216,9 @@ public class ContentActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Log.i( TAG, "launchVideo" );
-                watchYoutubeVideo( mContext, video_url );
+                watchYoutubeVideo( mContext, item.getVideoUrl() );
             }
         });
-    }
-
-
-    private Video createYoutubeObject(String id, String name){
-        return new Video(id, name);
     }
 
 
@@ -235,7 +230,7 @@ public class ContentActivity extends AppCompatActivity {
         ArrayList array = SharedHelperFavorites.getVideosList();
 
         if (array != null){
-            if (array.contains(video_url)){
+            if (array.contains(item.getVideoUrl())){
                 check = true;
             }
             else{

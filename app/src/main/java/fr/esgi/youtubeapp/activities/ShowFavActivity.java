@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,13 +75,8 @@ public class ShowFavActivity extends AppCompatActivity {
         //Test the internet's connection
         if (!DeviceManagerUtils.isConnected(mContext)) {
 
-            if (mLoader != null) {
-                mLoader.setVisibility(View.GONE);
-                mLoader = null;
-
-                mLinearNoConnectionContainer.setVisibility(View.VISIBLE);
-            }
-
+            Utils.dismissLoader(mLoader);
+            mLinearNoConnectionContainer.setVisibility(View.VISIBLE);
             Utils.showActionInToast(mContext, mContext.getResources().getString(R.string.pas_de_connexion));
 
         } else {
@@ -99,69 +95,69 @@ public class ShowFavActivity extends AppCompatActivity {
                     SharedHelperFavorites.init(mContext);
                     tmpArraylist = SharedHelperFavorites.getVideosList();
 
-                    for ( int i = 0 ;  i < contentList.size() ; i++ ){
+                    if ( tmpArraylist.size() == 0){
 
-                        for( int k=0 ; k < tmpArraylist.size() ; k++ ){
-                            if ( contentList.get(i).getVideoUrl().equals( tmpArraylist.get(k) ) ){
-                                favArrayList.add( contentList.get(i) );
+                        Utils.dismissLoader(mLoader);
+
+                        Toast.makeText(mContext, "Aucun favoris enregistrés", Toast.LENGTH_LONG).show();
+//                        showEmptyFavouritesMessage();
+                    } else {
+                        for ( int i = 0 ;  i < contentList.size() ; i++ ){
+
+                            for( int k=0 ; k < tmpArraylist.size() ; k++ ){
+                                if ( contentList.get(i).getVideoUrl().equals( tmpArraylist.get(k) ) ){
+                                    favArrayList.add( contentList.get(i) );
+                                }
                             }
                         }
-                    }
 
-                    //create the adapter
-                    contentAdapter = new YoutubeRecyclerAdapter(mContext, favArrayList);
+                        //create the adapter
+                        contentAdapter = new YoutubeRecyclerAdapter(mContext, favArrayList);
 
-                    //Set properties for the RecyclerView
-                    RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(mContext);
-                    favRecyclerView.setHasFixedSize(true);
-                    favRecyclerView.setLayoutManager(mLayoutManager);
-                    favRecyclerView.setItemAnimator(new DefaultItemAnimator());
-                    //contentRecyclerView.addItemDecoration(new DividerItemDecoration(mContext, LinearLayoutManager.VERTICAL));
-                    favRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(mContext, new RecyclerItemClickListener.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(View view, int position) {
-                            //Toast.makeText(mContext, position + " is selected", Toast.LENGTH_SHORT).show();
+                        //Set properties for the RecyclerView
+                        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(mContext);
+                        favRecyclerView.setHasFixedSize(true);
+                        favRecyclerView.setLayoutManager(mLayoutManager);
+                        favRecyclerView.setItemAnimator(new DefaultItemAnimator());
+                        //contentRecyclerView.addItemDecoration(new DividerItemDecoration(mContext, LinearLayoutManager.VERTICAL));
+                        favRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(mContext, new RecyclerItemClickListener.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(View view, int position) {
+                                //Toast.makeText(mContext, position + " is selected", Toast.LENGTH_SHORT).show();
 
-                            //Get the object's position in order to use the object and pass the data through the other activity
-                            Video content = contentList.get(position);
+                                //Get the object's position in order to use the object and pass the data through the other activity
+                                Video content = contentList.get(position);
 
-                            Intent intent = new Intent(mContext, ContentActivity.class);
+                                Intent intent = new Intent(mContext, ContentActivity.class);
 
-                            intent.putExtra(ContentActivity.ID_ARG, content.getFavId());
-                            intent.putExtra(ContentActivity.NAME_ARG, content.getName());
-                            intent.putExtra(ContentActivity.DESCRIPTION_ARG, content.getDescription());
-                            intent.putExtra(ContentActivity.IMAGE_THUMB_URL_ARG, content.getImageThumb());
-                            intent.putExtra(ContentActivity.VIDEO_URL_ARG, content.getVideoUrl());
+                                intent.putExtra( ContentActivity.VIDEO_OBJECT_ARG, content);
 
-                            View source_icon = view.findViewById(R.id.image_item);
+                                View source_icon = view.findViewById(R.id.image_item);
 
-                            //Create animation and start activity
-                            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(ShowFavActivity.this, source_icon, "thumb");
+                                //Create animation and start activity
+                                ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(ShowFavActivity.this, source_icon, "thumb");
 
-                            ActivityCompat.startActivity(mActivity, intent, options.toBundle());
+                                ActivityCompat.startActivity(mActivity, intent, options.toBundle());
+                            }
+                        }));
+
+                        if (mLoader != null) {
+                            mLoader.setVisibility(View.GONE);
+                            mLoader = null;
                         }
-                    }));
 
-                    if (mLoader != null) {
-                        mLoader.setVisibility(View.GONE);
-                        mLoader = null;
+                        if (favRecyclerView != null && !favRecyclerView.isInLayout()) {
+                            favRecyclerView.setVisibility(View.VISIBLE);
+                        }
+
+                        favRecyclerView.setAdapter(contentAdapter);
                     }
-
-                    if (favRecyclerView != null && !favRecyclerView.isInLayout()) {
-                        favRecyclerView.setVisibility(View.VISIBLE);
-                    }
-
-                    favRecyclerView.setAdapter(contentAdapter);
-
                 }
 
                 @Override
                 public void failure(RetrofitError error) {
 
-                    if (mLoader != null) {
-                        mLoader.setVisibility(View.GONE);
-                        mLoader = null;
-                    }
+                    Utils.dismissLoader(mLoader);
 
                     Log.e(TAG, error.getMessage());
                 }

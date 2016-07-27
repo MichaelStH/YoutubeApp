@@ -72,12 +72,9 @@ public class FetchContentActivity extends AppCompatActivity {
         //Test the internet's connection
         if( !DeviceManagerUtils.isConnected(mContext) ) {
 
-            if (mLoader != null) {
-                mLoader.setVisibility(View.GONE);
-                mLoader = null;
+            Utils.dismissLoader(mLoader);
 
-                mLinearNoConnectionContainer.setVisibility(View.VISIBLE);
-            }
+            mLinearNoConnectionContainer.setVisibility(View.VISIBLE);
 
             Utils.showActionInToast(mContext, mContext.getResources().getString( R.string.pas_de_connexion ) );
 
@@ -111,14 +108,7 @@ public class FetchContentActivity extends AppCompatActivity {
 
                             Intent intent = new Intent(mContext, ContentActivity.class);
 
-                            intent.putExtra(ContentActivity.ID_ARG, content.getFavId());
-                            intent.putExtra(ContentActivity.NAME_ARG, content.getName());
-                            intent.putExtra(ContentActivity.DESCRIPTION_ARG, content.getDescription());
-                            intent.putExtra(ContentActivity.IMAGE_THUMB_URL_ARG, content.getImageThumb());
-                            intent.putExtra(ContentActivity.VIDEO_URL_ARG, content.getVideoUrl());
-
-                            intent.putExtra(ContentActivity.IS_FAVORITE_ARG, isFavorite( content ) );
-
+                            intent.putExtra( ContentActivity.VIDEO_OBJECT_ARG, content);
 
                             View source_icon = view.findViewById(R.id.image_item);
 
@@ -129,10 +119,7 @@ public class FetchContentActivity extends AppCompatActivity {
                         }
                     }));
 
-                    if ( mLoader != null ){
-                        mLoader.setVisibility(View.GONE);
-                        mLoader = null;
-                    }
+                    Utils.dismissLoader(mLoader);
 
                     if ( contentRecyclerView != null && !contentRecyclerView.isInLayout()){
                         contentRecyclerView.setVisibility(View.VISIBLE);
@@ -144,12 +131,7 @@ public class FetchContentActivity extends AppCompatActivity {
 
                 @Override
                 public void failure(RetrofitError error) {
-
-                    if (mLoader != null) {
-                        mLoader.setVisibility(View.GONE);
-                        mLoader = null;
-                    }
-
+                    Utils.dismissLoader(mLoader);
                     Log.e(TAG, error.getMessage());
                 }
             });
@@ -210,7 +192,6 @@ public class FetchContentActivity extends AppCompatActivity {
         if (id == R.id.action_show_favorites) {
 
             startActivity(new Intent( mContext, ShowFavActivity.class ));
-
             return true;
         }
 

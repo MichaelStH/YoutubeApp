@@ -1,18 +1,10 @@
 package fr.esgi.youtubeapp.adapter;
 
 import android.content.Context;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -22,7 +14,7 @@ import fr.esgi.youtubeapp.model.Video;
 /**
  * Created by MichaelWayne on 15/03/2016.
  */
-public class YoutubeRecyclerAdapter extends RecyclerView.Adapter<YoutubeRecyclerAdapter.ViewHolder>{
+public class YoutubeRecyclerAdapter extends RecyclerView.Adapter<ViewHolder>{
 
     private static final String TAG = YoutubeRecyclerAdapter.class.getSimpleName();
 
@@ -39,6 +31,7 @@ public class YoutubeRecyclerAdapter extends RecyclerView.Adapter<YoutubeRecycler
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
+    /*
     public class ViewHolder extends RecyclerView.ViewHolder{
 
         public CardView itemCardView;
@@ -61,6 +54,7 @@ public class YoutubeRecyclerAdapter extends RecyclerView.Adapter<YoutubeRecycler
         }
     }
 
+    */
 
     @Override
     public int getItemCount() {
@@ -76,7 +70,7 @@ public class YoutubeRecyclerAdapter extends RecyclerView.Adapter<YoutubeRecycler
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemYoutubeRow = inflater.inflate(R.layout.content_list_item_row, parent, false );
 
-        return new ViewHolder(itemYoutubeRow);
+        return new ViewHolder(context, itemYoutubeRow);
     }
 
     @Override
@@ -84,6 +78,9 @@ public class YoutubeRecyclerAdapter extends RecyclerView.Adapter<YoutubeRecycler
 
         Video itemYoutubeVideo = youtubeList.get( position );
 
+        holder.bind(itemYoutubeVideo);
+
+        /*
         if (holder.itemLoader != null){
             holder.itemLoader.setVisibility(View.VISIBLE);
         }
@@ -114,8 +111,10 @@ public class YoutubeRecyclerAdapter extends RecyclerView.Adapter<YoutubeRecycler
 
         holder.name.setText(itemYoutubeVideo.getName());
         holder.description.setText(itemYoutubeVideo.getDescription());
+        */
     }
 
+    /*
     private class ImageLoadedCallback implements Callback{
 
         ProgressBar mProgressBar;
@@ -134,4 +133,5 @@ public class YoutubeRecyclerAdapter extends RecyclerView.Adapter<YoutubeRecycler
             Log.i("ImageLoadedCallback", "onError");
         }
     }
+    */
 }
