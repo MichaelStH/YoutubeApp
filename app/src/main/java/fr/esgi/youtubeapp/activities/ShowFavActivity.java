@@ -89,7 +89,7 @@ public class ShowFavActivity extends AppCompatActivity {
 
                     contentList = (ArrayList<Video>) videoItems;
 
-                    ArrayList<Video> favArrayList = new ArrayList<Video>();
+                    final ArrayList<Video> favArrayList = new ArrayList<Video>();
                     ArrayList<String> tmpArraylist = new ArrayList();
 
                     SharedHelperFavorites.init(mContext);
@@ -126,7 +126,7 @@ public class ShowFavActivity extends AppCompatActivity {
                                 //Toast.makeText(mContext, position + " is selected", Toast.LENGTH_SHORT).show();
 
                                 //Get the object's position in order to use the object and pass the data through the other activity
-                                Video content = contentList.get(position);
+                                Video content = favArrayList.get(position);
 
                                 Intent intent = new Intent(mContext, ContentActivity.class);
 
